@@ -24,7 +24,7 @@ public class AdminLoginTest {
     public void testLoginAdminRedirigeAListaUsuarios() throws Exception {
         // Registrar admin
         UsuarioData admin = new UsuarioData();
-        admin.setEmail("admin@umh.es");
+        admin.setEmail("admin");
         admin.setPassword("admin123");
         admin.setAdmin(true);
         usuarioService.registrar(admin);
