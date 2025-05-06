@@ -1,0 +1,21 @@
+name: Developer Tests
+
+on: push
+
+jobs:
+  launch-tests:
+    runs-on: ubuntu-latest
+    container: openjdk:8-jdk-alpine
+
+    steps:
+      # Checkout the repository's code
+      - uses: actions/checkout@v1
+      # Install Maven for correct running of the tests
+      - name: Install Maven
+        run: apk add --no-cache maven
+      # Set executable permission for the mvnw script
+      - name: Set permissions for Maven Wrapper
+        run: chmod +x ./mvnw
+      # Launch the tests
+      - name: Launch tests with Maven
+        run: ./mvnw test
