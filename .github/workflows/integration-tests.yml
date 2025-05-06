@@ -23,11 +23,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    steps:
-      - uses: actions/checkout@v1
+ steps:
+      - uses: actions/checkout@v4
+      
       - name: Ensure mvnw is executable
-        run: chmod +x ./mvnw
+        run: chmod +x ./mvnw  # Añade permisos de ejecución
+
       - name: Launch tests with Maven
         run: ./mvnw test -D spring.profiles.active=postgres
         env:
-          POSTGRES_HOST: postgres
+          POSTGRES_HOST: postgres  # Variable requerida para la conexión
