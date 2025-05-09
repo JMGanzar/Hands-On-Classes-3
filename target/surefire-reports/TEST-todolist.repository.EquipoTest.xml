@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="todolist.service.UserServiceTest" time="0.049" tests="6" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="todolist.repository.EquipoTest" time="0.115" tests="5" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="22"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -58,10 +58,9 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="66.0"/>
   </properties>
-  <testcase name="servicioRegistroUsuarioExcepcionConNullPassword" classname="todolist.service.UserServiceTest" time="0.004"/>
-  <testcase name="servicioRegistroUsuarioDevuelveUsuarioConId" classname="todolist.service.UserServiceTest" time="0.01"/>
-  <testcase name="servicioConsultaUsuarioDevuelveUsuario" classname="todolist.service.UserServiceTest" time="0.007"/>
-  <testcase name="servicioRegistroUsuario" classname="todolist.service.UserServiceTest" time="0.007"/>
-  <testcase name="servicioLoginUsuario" classname="todolist.service.UserServiceTest" time="0.009"/>
-  <testcase name="servicioRegistroUsuarioExcepcionConEmailRepetido" classname="todolist.service.UserServiceTest" time="0.007"/>
+  <testcase name="comprobarRelacionBaseDatos" classname="todolist.repository.EquipoTest" time="0.067"/>
+  <testcase name="comprobarFindAll" classname="todolist.repository.EquipoTest" time="0.018"/>
+  <testcase name="grabarYBuscarEquipo" classname="todolist.repository.EquipoTest" time="0.013"/>
+  <testcase name="crearEquipo" classname="todolist.repository.EquipoTest" time="0.003"/>
+  <testcase name="comprobarIgualdadEquipos" classname="todolist.repository.EquipoTest" time="0.003"/>
 </testsuite>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="todolist.service.UserServiceTest" time="0.049" tests="6" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="todolist.service.EquipoServiceTest" time="0.105" tests="5" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="22"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -58,10 +58,9 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="66.0"/>
   </properties>
-  <testcase name="servicioRegistroUsuarioExcepcionConNullPassword" classname="todolist.service.UserServiceTest" time="0.004"/>
-  <testcase name="servicioRegistroUsuarioDevuelveUsuarioConId" classname="todolist.service.UserServiceTest" time="0.01"/>
-  <testcase name="servicioConsultaUsuarioDevuelveUsuario" classname="todolist.service.UserServiceTest" time="0.007"/>
-  <testcase name="servicioRegistroUsuario" classname="todolist.service.UserServiceTest" time="0.007"/>
-  <testcase name="servicioLoginUsuario" classname="todolist.service.UserServiceTest" time="0.009"/>
-  <testcase name="servicioRegistroUsuarioExcepcionConEmailRepetido" classname="todolist.service.UserServiceTest" time="0.007"/>
+  <testcase name="listadoEquiposOrdenAlfabetico" classname="todolist.service.EquipoServiceTest" time="0.026"/>
+  <testcase name="comprobarExcepciones" classname="todolist.service.EquipoServiceTest" time="0.019"/>
+  <testcase name="añadirUsuarioAEquipoTest" classname="todolist.service.EquipoServiceTest" time="0.019"/>
+  <testcase name="recuperarEquiposDeUsuario" classname="todolist.service.EquipoServiceTest" time="0.026"/>
+  <testcase name="crearRecuperarEquipo" classname="todolist.service.EquipoServiceTest" time="0.008"/>
 </testsuite>

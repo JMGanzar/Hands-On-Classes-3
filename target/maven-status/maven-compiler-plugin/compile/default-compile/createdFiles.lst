@@ -1,12 +1,17 @@
 todolist\controller\exception\UsuarioNoLogeadoException.class
 todolist\model\Usuario.class
+todolist\repository\EquipoRepository.class
 todolist\controller\UsuarioController.class
 todolist\authentication\ManagerUserSession.class
+todolist\model\Equipo.class
+todolist\service\EquipoService.class
 todolist\dto\LoginData.class
 todolist\service\UsuarioService.class
 todolist\service\UsuarioService$LoginStatus.class
 todolist\service\UsuarioServiceException.class
+todolist\dto\EquipoData.class
 todolist\config\ModelMapperConfig.class
+todolist\service\EquipoServiceException.class
 todolist\controller\LoginController.class
 todolist\controller\TareaController.class
 todolist\service\InitDbService.class
