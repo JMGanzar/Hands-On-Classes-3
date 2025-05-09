@@ -4,63 +4,83 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "equipos")
-    public class Equipo implements Serializable {
+public class Equipo implements Serializable {
 
-        private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-        @NotNull
-        private String nombre;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @NotNull
+    private String nombre;
 
-        // Constructor vacío necesario para JPA/Hibernate.
-        // No debe usarse desde la aplicación.
-        public Equipo() {}
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "equipo_usuario",
+            joinColumns = { @JoinColumn(name = "fk_equipo") },
+            inverseJoinColumns = {@JoinColumn(name = "fk_usuario")})
 
-        // Al crear una tarea la asociamos automáticamente a un usuario
-        public Equipo(String nombre) {
-            this.nombre = nombre;
-        }
+    Set<Usuario> usuarios = new HashSet<>();
 
-        // Getters y setters básicos
 
-        public Long getId() {
-            return id;
-        }
+    // No debe usarse desde la aplicación.
+    public Equipo() {}
 
-        public void setId(Long id) {
-            this.id = id;
-        }
+    // Al crear una tarea la asociamos automáticamente a un usuario
+    public Equipo(String nombre) {
+        this.nombre = nombre;
+    }
 
-        public String getNombre() {
-            return nombre;
-        }
+    // Getters y setters básicos
 
-        public void setNombre(String titulo) {
-            this.nombre = titulo;
-        }
+    public Long getId() {
+        return id;
+    }
 
-        // equals para el tercer test
-        // que aparece en la prácitca
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            todolist.model.Equipo equipo = (todolist.model.Equipo) o;
-            if (id != null && equipo.id != null)
-                // Si tenemos los ID, comparamos por ID
-                return Objects.equals(id, equipo.id);
-            // si no comparamos por campos obligatorios
-            return nombre.equals(equipo.nombre);
-        }
+    public String getNombre() {
+        return nombre;
+    }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(nombre);
-        }
+    public void setNombre(String titulo) {
+        this.nombre = titulo;
+    }
+
+    public Set<Usuario> getUsuarios() {
+        return usuarios;
+    }
+
+    public void addUsuario(Usuario usuario) {
+        // Hay que actualiar ambas colecciones, porque
+        // JPA/Hibernate no lo hace automáticamente
+        this.getUsuarios().add(usuario);
+        usuario.getEquipos().add(this);
+    }
+
+    // equals para el tercer test
+    // que aparece en la prácitca
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        todolist.model.Equipo equipo = (todolist.model.Equipo) o;
+        if (id != null && equipo.id != null)
+            // Si tenemos los ID, comparamos por ID
+            return Objects.equals(id, equipo.id);
+        // si no comparamos por campos obligatorios
+        return nombre.equals(equipo.nombre);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre);
+    }
 }
