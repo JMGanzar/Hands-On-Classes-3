@@ -2,6 +2,7 @@ todolist\controller\exception\UsuarioNoLogeadoException.class
 todolist\model\Usuario.class
 todolist\controller\UsuarioController.class
 todolist\authentication\ManagerUserSession.class
+todolist\model\Equipo.class
 todolist\dto\LoginData.class
 todolist\service\UsuarioService.class
 todolist\service\UsuarioService$LoginStatus.class

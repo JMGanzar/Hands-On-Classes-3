@@ -17,4 +17,5 @@ todolist\controller\UserWebTest.class
 todolist\controller\AboutPageTest.class
 todolist\repository\TaskTest.class
 todolist\service\UserBlockServiceTest.class
+todolist\repository\EquipoTest.class
 todolist\integration\AdminUserBlockIntegrationTest.class
