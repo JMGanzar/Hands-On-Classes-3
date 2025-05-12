@@ -183,4 +183,11 @@ public class EquipoServiceTest {
         assertThatThrownBy(() -> equipoService.recuperarEquipo(equipo.getId()))
                 .isInstanceOf(EquipoServiceException.class);
     }
+
+    @Test
+    public void crearEquipoConNombreNuloLanzaExcepcion() {
+        assertThatThrownBy(() -> equipoService.crearEquipo(null))
+                .isInstanceOf(EquipoServiceException.class)
+                .hasMessage("El equipo no tiene nombre");
+    }
 }
