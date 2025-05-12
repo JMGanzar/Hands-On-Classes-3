@@ -24,6 +24,10 @@
         </div>
     </div>
 
+    <!-- Mensajes de éxito/error -->
+    <div th:if="${success != null}" class="alert alert-success mt-3" th:text="${success}"></div>
+    <div th:if="${error != null}" class="alert alert-danger mt-3" th:text="${error}"></div>
+
     <!-- Contenido principal -->
     <div class="row mt-4">
         <div class="col-md-8 offset-md-2">
@@ -99,6 +103,14 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-8 offset-md-2 text-center">
+            <a th:href="@{/teams/new}" class="btn btn-success">
+                <i class="fas fa-plus-circle mr-2"></i>Crear Nuevo Equipo
+            </a>
         </div>
     </div>
 </div>
