@@ -9,6 +9,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 
 @SpringBootTest
@@ -182,5 +183,26 @@ public class EquipoServiceTest {
         // Verificar que no existe
         assertThatThrownBy(() -> equipoService.recuperarEquipo(equipo.getId()))
                 .isInstanceOf(EquipoServiceException.class);
+    }
+
+    @Test
+    public void crearEquipoConNombreNuloLanzaExcepcion() {
+        assertThatThrownBy(() -> equipoService.crearEquipo(null))
+                .isInstanceOf(EquipoServiceException.class)
+                .hasMessage("El equipo no tiene nombre");
+    }
+
+    @Test
+    void crearEquipoConNombreDuplicadoLanzaExcepcion() {
+        // Configuración
+        String nombreEquipo = "Proyecto Alpha";
+
+        // Crear primer equipo usando el servicio
+        equipoService.crearEquipo(nombreEquipo);
+
+        // Verificación
+        assertThatThrownBy(() -> equipoService.crearEquipo(nombreEquipo))
+                .isInstanceOf(EquipoServiceException.class)
+                .hasMessage("El equipo Proyecto Alpha ya está registrado");
     }
 }
