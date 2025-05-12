@@ -153,6 +153,28 @@ public class EquipoService {
 
     }
 
+    @Transactional(readOnly = true)
+    public List<UsuarioData> findAllUsuariosNoEnEquipo(Long equipoId) {
+        // 1. Obtener el equipo
+        Equipo equipo = equipoRepository.findById(equipoId)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+
+        // 2. Obtener todos los usuarios como List<Usuario>
+        Iterable<Usuario> usuariosIterable = usuarioRepository.findAll();
+        List<Usuario> todosUsuarios = new ArrayList<>();
+        usuariosIterable.forEach(todosUsuarios::add);
+
+        // 3. Filtrar usuarios que NO están en el equipo
+        List<Usuario> usuariosNoEnEquipo = todosUsuarios.stream()
+                .filter(usuario -> !equipo.getUsuarios().contains(usuario))
+                .collect(Collectors.toList());
+
+        // 4. Convertir a DTOs
+        return usuariosNoEnEquipo.stream()
+                .map(usuario -> modelMapper.map(usuario, UsuarioData.class))
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void eliminarUsuarioDeEquipo(Long equipoId, Long usuarioId) {
         Equipo equipo = equipoRepository.findById(equipoId)
