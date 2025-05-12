@@ -152,5 +152,17 @@ public class EquipoService {
         return equipos;
 
     }
+
+    @Transactional
+    public void eliminarUsuarioDeEquipo(Long equipoId, Long usuarioId) {
+        Equipo equipo = equipoRepository.findById(equipoId)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new EquipoServiceException("Usuario no encontrado"));
+
+        // Actualizar ambas partes de la relación
+        equipo.getUsuarios().remove(usuario);
+        usuario.getEquipos().remove(equipo);
+    }
 }
 
