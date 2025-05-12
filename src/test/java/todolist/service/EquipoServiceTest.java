@@ -142,4 +142,19 @@ public class EquipoServiceTest {
                 .isInstanceOf(EquipoServiceException.class);
     }
 
+    @Test
+    public void añadirUsuarioDuplicadoAEquipoTest() {
+        // GIVEN: Usuario ya en el equipo
+        UsuarioData usuarioData = new UsuarioData(); // Constructor vacío
+        usuarioData.setEmail("user2@umh");
+        usuarioData.setPassword("5678");
+        UsuarioData usuario = usuarioService.registrar(usuarioData); // <-- ¡Así sí funciona!
+
+        EquipoData equipo = equipoService.crearEquipo("Project Z");
+        equipoService.añadirUsuarioAEquipo(equipo.getId(), usuario.getId());
+
+        // WHEN/THEN: Intentar añadirlo de nuevo
+        assertThatThrownBy(() -> equipoService.añadirUsuarioAEquipo(equipo.getId(), usuario.getId()))
+                .isInstanceOf(EquipoServiceException.class);
+    }
 }
