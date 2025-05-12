@@ -1,19 +1,20 @@
 package todolist.controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import todolist.authentication.ManagerUserSession;
 import todolist.dto.EquipoData;
 import todolist.dto.UsuarioData;
 import todolist.service.EquipoService;
+import todolist.service.EquipoServiceException;
 import todolist.service.UsuarioService;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -191,6 +192,57 @@ public class TeamsController {
             return "redirect:/teams";
         } catch (RuntimeException e) {
             return "redirect:/teams?error=" + e.getMessage();
+        }
+    }
+
+    @GetMapping("/teams/new")
+    public String mostrarFormularioCreacion(Model model, HttpSession session) {
+        Long usuarioId = managerUserSession.usuarioLogeado();
+        if (usuarioId == null) return "redirect:/login";
+
+        try {
+            UsuarioData usuarioLogeado = usuarioService.findById(usuarioId);
+            model.addAttribute("teamData", new EquipoData());
+            model.addAttribute("loggedIn", true);
+            model.addAttribute("usuarioLogeado", usuarioLogeado);
+            model.addAttribute("usuario", usuarioLogeado);
+            return "create-team";
+        } catch (RuntimeException e) {
+            return "redirect:/teams?error=Error al cargar el formulario";
+        }
+    }
+
+    @PostMapping("/teams")
+    public String crearEquipo(
+            @Valid @ModelAttribute("teamData") EquipoData teamData,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            Model model,
+            HttpSession session) {
+
+        Long usuarioId = managerUserSession.usuarioLogeado();
+        if (usuarioId == null) return "redirect:/login";
+
+        try {
+            UsuarioData usuarioLogeado = usuarioService.findById(usuarioId);
+            model.addAttribute("loggedIn", true);
+            model.addAttribute("usuarioLogeado", usuarioLogeado);
+
+            if (bindingResult.hasErrors()) {
+                return "create-team";
+            }
+
+            equipoService.crearEquipo(teamData.getNombre());
+            redirectAttributes.addFlashAttribute("success", "Equipo creado exitosamente");
+            return "redirect:/teams";
+
+        } catch (EquipoServiceException e) {
+            model.addAttribute("error", e.getMessage());
+            return "create-team";
+
+        } catch (DataIntegrityViolationException e) {
+            model.addAttribute("error", "Error al crear el equipo. Contacta al administrador.");
+            return "create-team";
         }
     }
 }

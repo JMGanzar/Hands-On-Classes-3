@@ -12,6 +12,7 @@ import todolist.authentication.ManagerUserSession;
 import todolist.dto.EquipoData;
 import todolist.dto.UsuarioData;
 import todolist.service.EquipoService;
+import todolist.service.EquipoServiceException;
 import todolist.service.UsuarioService;
 
 import java.util.Arrays;
@@ -185,5 +186,178 @@ class TeamsControllerTest {
         mockMvc.perform(post("/teams/1/remove-user"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login"));
+    }
+
+    @Test
+    void mostrarFormularioCreacion_UsuarioNoLogeado_RedirigeALogin() throws Exception {
+        when(managerUserSession.usuarioLogeado()).thenReturn(null);
+
+        mockMvc.perform(get("/teams/new"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login"));
+    }
+
+    @Test
+    void mostrarFormularioCreacion_UsuarioLogeado_MuestraFormulario() throws Exception {
+        Long userId = 1L;
+        UsuarioData usuario = new UsuarioData();
+        usuario.setId(userId);
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.findById(userId)).thenReturn(usuario);
+
+        mockMvc.perform(get("/teams/new"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("create-team"))
+                .andExpect(model().attributeExists("teamData"));
+    }
+
+    @Test
+    void crearEquipo_Duplicado_MuestraError() throws Exception {
+        Long userId = 1L;
+        UsuarioData usuario = new UsuarioData();
+        usuario.setId(userId);
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.findById(userId)).thenReturn(usuario);
+        doThrow(new EquipoServiceException("Equipo duplicado")).when(equipoService).crearEquipo("Equipo Duplicado");
+
+        mockMvc.perform(post("/teams")
+                        .param("nombre", "Equipo Duplicado"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("create-team"))
+                .andExpect(model().attributeExists("error"));
+    }
+
+    @Test
+    void mostrarFormularioEdicion_UsuarioNoAdmin_Redirige() throws Exception {
+        Long userId = 1L;
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(false);
+
+        mockMvc.perform(get("/teams/1/edit"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/teams?error=Acceso no autorizado para edición"));
+    }
+
+    @Test
+    void mostrarFormularioEdicion_AdminYEquipoValido_MuestraFormulario() throws Exception {
+        Long userId = 1L;
+        Long teamId = 1L;
+        UsuarioData usuario = new UsuarioData();
+        usuario.setId(userId);
+        EquipoData equipo = new EquipoData();
+        equipo.setId(teamId);
+        equipo.setNombre("Equipo Existente");
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(true);
+        when(usuarioService.findById(userId)).thenReturn(usuario);
+        when(equipoService.recuperarEquipo(teamId)).thenReturn(equipo);
+
+        mockMvc.perform(get("/teams/1/edit"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("editTeam"))
+                .andExpect(model().attribute("equipo", equipo));
+    }
+
+    @Test
+    void mostrarFormularioEdicion_EquipoNoExiste_RedirigeConError() throws Exception {
+        Long userId = 1L;
+        Long teamId = 999L;
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(true);
+        when(equipoService.recuperarEquipo(teamId)).thenThrow(new RuntimeException("Equipo no encontrado"));
+
+        mockMvc.perform(get("/teams/999/edit"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/teams?error=Error al cargar el equipo: Equipo no encontrado"));
+    }
+
+    @Test
+    void editarEquipo_Valido_RedirigeATeams() throws Exception {
+        Long userId = 1L;
+        Long teamId = 1L;
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(true);
+        doNothing().when(equipoService).renombrarEquipo(teamId, "Nuevo Nombre");
+
+        mockMvc.perform(post("/teams/1/edit")
+                        .param("nombre", "Nuevo Nombre"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/teams"));
+    }
+
+    @Test
+    void editarEquipo_UsuarioNoAdmin_Redirige() throws Exception {
+        Long userId = 1L;
+        Long teamId = 1L;
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(false);
+
+        mockMvc.perform(post("/teams/1/edit")
+                        .param("nombre", "Nuevo Nombre"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/teams?error=Acceso no autorizado"));
+    }
+
+    @Test
+    void editarEquipo_ErrorServicio_RedirigeConError() throws Exception {
+        Long userId = 1L;
+        Long teamId = 1L;
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(true);
+        doThrow(new RuntimeException("Error al renombrar")).when(equipoService).renombrarEquipo(teamId, "Nombre Invalido");
+
+        mockMvc.perform(post("/teams/1/edit")
+                        .param("nombre", "Nombre Invalido"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/teams/1/edit"))
+                .andExpect(flash().attributeExists("error"));
+    }
+
+    @Test
+    void eliminarEquipo_AdminExitoso_RedirigeATeams() throws Exception {
+        Long userId = 1L;
+        Long teamId = 1L;
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(true);
+        doNothing().when(equipoService).eliminarEquipo(teamId);
+
+        mockMvc.perform(post("/teams/1/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/teams"));
+    }
+
+    @Test
+    void eliminarEquipo_NoAdmin_RedirigeConError() throws Exception {
+        Long userId = 1L;
+        Long teamId = 1L;
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(false);
+
+        mockMvc.perform(post("/teams/1/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/teams?error=Acceso no autorizado"));
+    }
+
+    @Test
+    void eliminarEquipo_ErrorServicio_RedirigeConError() throws Exception {
+        Long userId = 1L;
+        Long teamId = 1L;
+
+        when(managerUserSession.usuarioLogeado()).thenReturn(userId);
+        when(usuarioService.isAdmin(userId)).thenReturn(true);
+        doThrow(new RuntimeException("Error al eliminar")).when(equipoService).eliminarEquipo(teamId);
+
+        mockMvc.perform(post("/teams/1/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/teams?error=Error al eliminar"));
     }
 }
