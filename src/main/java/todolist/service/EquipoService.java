@@ -42,15 +42,6 @@ public class EquipoService {
     }
 
     @Transactional(readOnly = true)
-    public EquipoData findByNombre(String nombre) {
-        Equipo equipo = equipoRepository.findByNombre(nombre).orElse(null);
-        if (equipo == null) return null;
-        else {
-            return modelMapper.map(equipo, EquipoData.class);
-        }
-    }
-
-    @Transactional(readOnly = true)
     public EquipoData findById(Long equipoId) {
         Equipo equipo = equipoRepository.findById(equipoId).orElse(null);
         if (equipo == null) return null;
@@ -180,6 +171,14 @@ public class EquipoService {
         // Actualizar ambas partes de la relación
         equipo.getUsuarios().remove(usuario);
         usuario.getEquipos().remove(equipo);
+    }
+
+    @Transactional
+    public void renombrarEquipo(Long equipoId, String nuevoNombre) {
+        Equipo equipo = equipoRepository.findById(equipoId)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        equipo.setNombre(nuevoNombre);
+        equipoRepository.save(equipo);
     }
 }
 
