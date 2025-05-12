@@ -49,16 +49,43 @@
                                 th:class="${stat.odd} ? 'table-light' : ''">
                                 <td th:text="${team.id}"></td>
                                 <td>
-                                        <span th:text="${team.nombre}"
-                                              class="font-weight-bold"></span>
+                                    <span th:text="${team.nombre}"
+                                          class="font-weight-bold"></span>
                                 </td>
                                 <td class="text-center">
-                                    <a th:href="@{|/teams/${team.id}/members|}"
-                                       class="btn btn-sm btn-outline-info"
-                                       title="Ver miembros del equipo">
-                                        <i class="fas fa-user-friends mr-1"></i>
-                                        <span class="d-none d-md-inline">Miembros</span>
-                                    </a>
+                                    <div class="btn-group" role="group">
+                                        <!-- Botón Miembros -->
+                                        <a th:href="@{|/teams/${team.id}/members|}"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="Ver miembros del equipo">
+                                            <i class="fas fa-user-friends mr-1"></i>
+                                            <span class="d-none d-md-inline">Miembros</span>
+                                        </a>
+
+                                        <!-- Botones solo para admins -->
+                                        <!-- Editar -->
+                                        <a th:if="${usuarioLogeado != null and usuarioLogeado.admin}"
+                                           th:href="@{|/teams/${team.id}/edit|}"
+                                           class="btn btn-sm btn-outline-warning ml-1"
+                                           title="Editar equipo">
+                                            <i class="fas fa-edit mr-1"></i>
+                                            <span class="d-none d-md-inline">Editar</span>
+                                        </a>
+
+                                        <!-- Eliminar -->
+                                        <form th:if="${usuarioLogeado != null and usuarioLogeado.admin}"
+                                              th:action="@{|/teams/${team.id}/delete|}"
+                                              method="post"
+                                              class="d-inline ml-1">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Eliminar equipo"
+                                                    onclick="return confirm('¿Eliminar este equipo?')">
+                                                <i class="fas fa-trash-alt mr-1"></i>
+                                                <span class="d-none d-md-inline">Eliminar</span>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(teams)}">
