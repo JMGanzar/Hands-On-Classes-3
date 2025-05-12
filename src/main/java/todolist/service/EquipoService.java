@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,13 +100,13 @@ public class EquipoService {
     }
 
     @Transactional
-    public void añadirUsuarioAEquipo(Long idEquipo, Long idUsuario) {
+    public void añadirUsuarioAEquipo(Long equipoId, Long usuarioId) {
         // Recuperamos el equipo
-        Equipo equipo = equipoRepository.findById(idEquipo)
+        Equipo equipo = equipoRepository.findById(equipoId)
                 .orElseThrow(() -> new EquipoServiceException("El equipo no existe"));
 
         // Recuperamos el usuario
-        Usuario usuario = usuarioRepository.findById(idUsuario)
+        Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new EquipoServiceException("El usuario no existe"));
 
         // Comprobamos duplicados
@@ -120,23 +117,21 @@ public class EquipoService {
         // Añadimos el usuario al equipo
         equipo.addUsuario(usuario);
 
-        // Guardamos los cambios (¡esto es clave para tu lógica original!)
+        // Guardamos los cambios
         equipoRepository.save(equipo);
         usuarioRepository.save(usuario);
     }
 
     @Transactional
     public List<UsuarioData> usuariosEquipo(Long idEquipo) {
-        // recuperamos el equipo
-        Equipo equipo = equipoRepository.findById(idEquipo).orElse(null);
-        if (equipo == null)
-            throw new EquipoServiceException("El equipo no existe");
+        Equipo equipo = equipoRepository.findById(idEquipo)
+                .orElseThrow(() -> new EquipoServiceException("El equipo no existe"));
 
-        // cambiamos el tipo de la lista de usuarios
-        List<UsuarioData> usuarios = equipo.getUsuarios().stream()
+        return equipo.getUsuarios().stream()
+                .sorted(Comparator.comparing(Usuario::getNombre)) // Orden alfabético
+                // .sorted(Comparator.comparing(Usuario::getId)) // Para ordenar por ID
                 .map(usuario -> modelMapper.map(usuario, UsuarioData.class))
                 .collect(Collectors.toList());
-        return usuarios;
     }
 
     @Transactional
@@ -151,6 +146,28 @@ public class EquipoService {
                 .collect(Collectors.toList());
         return equipos;
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<UsuarioData> findAllUsuariosNoEnEquipo(Long equipoId) {
+        // 1. Obtener el equipo
+        Equipo equipo = equipoRepository.findById(equipoId)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+
+        // 2. Obtener todos los usuarios como List<Usuario>
+        Iterable<Usuario> usuariosIterable = usuarioRepository.findAll();
+        List<Usuario> todosUsuarios = new ArrayList<>();
+        usuariosIterable.forEach(todosUsuarios::add);
+
+        // 3. Filtrar usuarios que NO están en el equipo
+        List<Usuario> usuariosNoEnEquipo = todosUsuarios.stream()
+                .filter(usuario -> !equipo.getUsuarios().contains(usuario))
+                .collect(Collectors.toList());
+
+        // 4. Convertir a DTOs
+        return usuariosNoEnEquipo.stream()
+                .map(usuario -> modelMapper.map(usuario, UsuarioData.class))
+                .collect(Collectors.toList());
     }
 
     @Transactional
