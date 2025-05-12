@@ -104,25 +104,25 @@ public class EquipoService {
 
     @Transactional
     public void añadirUsuarioAEquipo(Long idEquipo, Long idUsuario) {
-        // recuperamos el equipo
-        Equipo equipo = equipoRepository.findById(idEquipo).orElse(null);
-        if (equipo == null) throw new EquipoServiceException("El equipo no existe");
+        // Recuperamos el equipo
+        Equipo equipo = equipoRepository.findById(idEquipo)
+                .orElseThrow(() -> new EquipoServiceException("El equipo no existe"));
 
-        // recuperamos el usuario
-        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
-        if (usuario == null) throw new EquipoServiceException("El usuario no existe");
+        // Recuperamos el usuario
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new EquipoServiceException("El usuario no existe"));
 
-        // comprobamos que el usuario no pertenece al equipo
-        if (equipo.getUsuarios().contains(usuario))
+        // Comprobamos duplicados
+        if (equipo.getUsuarios().contains(usuario)) {
             throw new EquipoServiceException("El usuario ya pertenece al equipo");
+        }
 
-        // añadimos el usuario al equipo
+        // Añadimos el usuario al equipo
         equipo.addUsuario(usuario);
-        // guardamos el equipo
+
+        // Guardamos los cambios (¡esto es clave para tu lógica original!)
         equipoRepository.save(equipo);
-        // guardamos el usuario
         usuarioRepository.save(usuario);
-        // con ello se guarda la relación
     }
 
     @Transactional
@@ -151,6 +151,18 @@ public class EquipoService {
                 .collect(Collectors.toList());
         return equipos;
 
+    }
+
+    @Transactional
+    public void eliminarUsuarioDeEquipo(Long equipoId, Long usuarioId) {
+        Equipo equipo = equipoRepository.findById(equipoId)
+                .orElseThrow(() -> new EquipoServiceException("Equipo no encontrado"));
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new EquipoServiceException("Usuario no encontrado"));
+
+        // Actualizar ambas partes de la relación
+        equipo.getUsuarios().remove(usuario);
+        usuario.getEquipos().remove(equipo);
     }
 }
 
