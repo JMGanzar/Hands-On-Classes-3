@@ -176,15 +176,15 @@ public class EquipoService {
     @Transactional
     public EquipoData crearEquipo(String nombre) {
         Optional<Equipo> equipoBD = equipoRepository.findByNombre(nombre);
-        if (equipoBD.isPresent())
+
+        if (equipoBD.isPresent()) {
             throw new EquipoServiceException("El equipo " + nombre + " ya está registrado");
-        else if (nombre == null)
+        } else if (nombre == null) {
             throw new EquipoServiceException("El equipo no tiene nombre");
-        else {
-            Equipo equipoNuevo = modelMapper.map(new Equipo(), Equipo.class);
+        } else {
+            Equipo equipoNuevo = new Equipo();
             equipoNuevo.setNombre(nombre);
             equipoNuevo = equipoRepository.save(equipoNuevo);
-
             return modelMapper.map(equipoNuevo, EquipoData.class);
         }
     }
