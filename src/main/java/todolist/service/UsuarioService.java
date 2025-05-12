@@ -4,8 +4,6 @@ import todolist.dto.UsuarioData;
 import todolist.model.Usuario;
 import todolist.repository.UsuarioRepository;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +14,6 @@ import java.util.Optional;
 
 @Service
 public class UsuarioService {
-
-    Logger logger = LoggerFactory.getLogger(UsuarioService.class);
 
     public enum LoginStatus {LOGIN_OK, USER_NOT_FOUND, ERROR_PASSWORD}
 
@@ -95,5 +91,12 @@ public class UsuarioService {
         return StreamSupport.stream(usuarios.spliterator(), false)
                 .map(usuario -> modelMapper.map(usuario, UsuarioData.class))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isAdmin(Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioServiceException("Usuario no encontrado"));
+        return usuario.isAdmin();
     }
 }

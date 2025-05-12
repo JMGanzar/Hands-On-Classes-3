@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import todolist.authentication.ManagerUserSession;
 import todolist.dto.EquipoData;
@@ -117,6 +118,62 @@ public class TeamsController {
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/teams/" + teamId + "/members";
+        }
+    }
+
+    @GetMapping("/teams/{teamId}/edit")
+    public String mostrarFormularioEdicion(@PathVariable Long teamId, Model model) {
+        Long usuarioId = managerUserSession.usuarioLogeado();
+        if (usuarioId == null) return "redirect:/login";
+
+        // Validar si es admin
+        if (!usuarioService.isAdmin(usuarioId)) {
+            return "redirect:/teams?error=Acceso no autorizado";
+        }
+
+        try {
+            EquipoData equipo = equipoService.recuperarEquipo(teamId);
+            model.addAttribute("equipo", equipo);
+            model.addAttribute("loggedIn", true);
+            model.addAttribute("usuarioLogeado", usuarioService.findById(usuarioId));
+            return "editTeam";
+        } catch (RuntimeException e) {
+            return "redirect:/teams?error=" + e.getMessage();
+        }
+    }
+
+    @PostMapping("/teams/{teamId}/edit")
+    public String editarEquipo(
+            @PathVariable Long teamId,
+            @RequestParam("nombre") String nombre, // Nombre del parámetro explícito
+            RedirectAttributes redirectAttributes) {
+
+        Long usuarioId = managerUserSession.usuarioLogeado();
+        if (usuarioId == null || !usuarioService.isAdmin(usuarioId)) {
+            return "redirect:/teams?error=Acceso no autorizado";
+        }
+
+        try {
+            equipoService.renombrarEquipo(teamId, nombre);
+            return "redirect:/teams";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/teams/" + teamId + "/edit";
+        }
+    }
+
+    @PostMapping("/teams/{teamId}/delete")
+    public String eliminarEquipo(@PathVariable Long teamId) {
+        Long usuarioId = managerUserSession.usuarioLogeado();
+        if (usuarioId == null || !usuarioService.isAdmin(usuarioId)) {
+            return "redirect:/teams?error=Acceso no autorizado";
+        }
+
+        try {
+            equipoService.eliminarEquipo(teamId);
+            return "redirect:/teams";
+        } catch (RuntimeException e) {
+            return "redirect:/teams?error=" + e.getMessage();
         }
     }
 }
