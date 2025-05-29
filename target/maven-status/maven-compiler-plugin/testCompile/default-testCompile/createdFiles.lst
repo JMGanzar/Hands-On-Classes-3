@@ -10,6 +10,7 @@ todolist\service\AdminRegistrationTest.class
 todolist\service\UserServiceTest.class
 todolist\repository\UserBlockRepositoryTest.class
 todolist\controller\AdminLoginTest.class
+todolist\controller\TeamsControllerTest.class
 todolist\repository\UserListTest.class
 todolist\controller\UserDescriptionValidationTest.class
 todolist\service\UserListServiceTest.class

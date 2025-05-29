@@ -39,4 +39,4 @@ Database Tables Screenshots
 Useful Links: 
 - GitHub Repository: https://github.com/JMGanzar/Hands-On-Classes-3
 - Trello's Board: https://trello.com/b/qwBdSOAF/p2-y-p3-to-do-list-app
-- Docker Image: https://hub.docker.com/r/jmganzar/p2-todolistapp
+- Docker Image: https://hub.docker.com/r/jmganzar/p3-todolistapp/tags

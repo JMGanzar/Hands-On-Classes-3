@@ -154,7 +154,7 @@ The `EquipoService` class contains the business logic for managing teams. It int
 
 The Thymeleaf templates provide the user interface for team management. They include forms for creating and renaming teams, as well as displaying lists of teams with options for users to manage their memberships.
 
-### 7. Tables Screenshots
+### 7. Database Tables Screenshots
 
 ![Tabla Usuarios](assets/Captura_Tabla_Usuarios.png)
 ![Tabla Tareas](assets/Captura_Tabla_Tareas.png)
@@ -165,3 +165,4 @@ The Thymeleaf templates provide the user interface for team management. They inc
 
 - **GitHub Repository**: https://github.com/JMGanzar/Hands-On-Classes-3
 - **Trello's Board**: https://trello.com/b/qwBdSOAF/p2-y-p3-to-do-list-app
+- **Docker Image**: https://hub.docker.com/r/jmganzar/p3-todolistapp/tags

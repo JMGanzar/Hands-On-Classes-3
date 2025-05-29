@@ -1,6 +1,8 @@
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\AboutPageTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\AdminUserBlockControllerTest.java
+C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\TeamsControllerTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\UserDescriptionValidationTest.java
+C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\repository\EquipoTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\service\UserListServiceTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\UserWebTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\UserDescriptionWebTest.java
@@ -12,6 +14,7 @@ C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\repository\TaskTe
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\AdminLoginTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\NavbarTests.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\service\UserBlockServiceTest.java
+C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\service\EquipoServiceTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\service\TaskServiceTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\controller\TaskWebTest.java
 C:\Users\jmgan\GitHub\Hand-On-Classes-3\src\test\java\todolist\service\UserServiceTest.java
