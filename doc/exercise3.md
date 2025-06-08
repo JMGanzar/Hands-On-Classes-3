@@ -140,19 +140,138 @@ This documentation provides a comprehensive technical overview of the implementa
         - `testRenameTeamNotFound()`: Tests renaming a non-existent team.
         - `testDeleteTeamNotFound()`: Tests deleting a non-existent team.
 
-### 6. Code Explanations
+### 6. Relevant Code Examples Explained
 
-#### 6.1 TeamsController
+#### 6.1 Logic for Creating Teams (User Story 011)
 
-The `TeamsController` class handles HTTP requests related to team management. It includes methods for creating, renaming, adding users to, and removing users from teams. Each method is annotated with appropriate HTTP method annotations (e.g., `@PostMapping`) to define the request type.
+```java
+// TeamsController.java
+@PostMapping("/create")
+public String createTeam(@ModelAttribute TeamData teamData,
+Authentication authentication) {
 
-#### 6.2 EquipoService
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    Usuario creador = usuarioService.findByEmail(userDetails.getUsername());
+    
+    equipoService.crearEquipo(teamData.getNombre(), creador);
+    return "redirect:/teams";
+}
 
-The `EquipoService` class contains the business logic for managing teams. It interacts with the `EquipoRepository` to perform CRUD operations on team entities. The service methods ensure that the necessary validations are performed before executing any database operations.
+// EquipoService.java
+public void crearEquipo(String nombre, Usuario creador) {
+Equipo nuevoEquipo = new Equipo(nombre);
+nuevoEquipo.setCreador(creador);
+nuevoEquipo.getMiembros().add(creador);  // Creador es miembro automático
+equipoRepository.save(nuevoEquipo);
+}
+```
+##### Explanation:
 
-#### 6.3 Thymeleaf Templates
+- The team creator is obtained directly from the Spring security context.
+- A bidirectional relationship is established: the user is added as a member of the team, and the team is associated with the user.
+- Correct persistence of JPA relationships is ensured through CascadeType.PERSIST.
 
-The Thymeleaf templates provide the user interface for team management. They include forms for creating and renaming teams, as well as displaying lists of teams with options for users to manage their memberships.
+#### 6.2 Admin Validation (User Story 010)
+
+```java
+// TeamsController.java
+@PostMapping("/{teamId}/delete")
+public String deleteTeam(@PathVariable Long teamId,
+Authentication authentication,
+RedirectAttributes redirectAttributes) {
+
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    Usuario usuario = usuarioService.findByEmail(userDetails.getUsername());
+    
+    if(!equipoService.esAdministrador(teamId, usuario.getId())) {
+        redirectAttributes.addFlashAttribute("error", "Solo los administradores pueden eliminar equipos");
+        return "redirect:/teams";
+    }
+    
+    equipoService.eliminarEquipo(teamId);
+    return "redirect:/teams";
+}
+```
+##### Explanation:
+
+- Permission verification in the controller before executing sensitive operations.
+- Use of RedirectAttributes to send flash messages to the client.
+- Clear separation between authorization logic and business operations.
+
+#### 6.3 Member Management (User Story 009)
+
+```java
+// EquipoService.java
+@Transactional
+public void añadirUsuarioAEquipo(Long teamId, Long userId) {
+Equipo equipo = equipoRepository.findById(teamId)
+.orElseThrow(() -> new EntityNotFoundException("Equipo no encontrado"));
+
+    Usuario usuario = usuarioRepository.findById(userId)
+        .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+    
+    if(!equipo.getMiembros().contains(usuario)) {
+        equipo.getMiembros().add(usuario);
+        usuario.getEquipos().add(equipo);
+    }
+}
+
+// TeamsController.java
+@PostMapping("/{teamId}/addUser")
+public String addSelfToTeam(@PathVariable Long teamId,
+Authentication authentication) {
+UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+Usuario usuario = usuarioService.findByEmail(userDetails.getUsername());
+
+    equipoService.añadirUsuarioAEquipo(teamId, usuario.getId());
+    return "redirect:/teams/" + teamId;
+}
+```
+##### Explanation:
+
+- Use of transactions (@Transactional) to maintain data consistency.
+- Verification of existing membership to prevent duplicates.
+- Self-join pattern where the authenticated user is automatically the subject of the action.
+
+#### 6.4 JPA Relationships in Entities
+
+```java
+// Entidad Equipo.java
+@Entity
+public class Equipo {
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+
+    private String nombre;
+    
+    @ManyToOne
+    private Usuario creador;
+    
+    @ManyToMany
+    @JoinTable(
+        name = "equipo_usuario",
+        joinColumns = @JoinColumn(name = "equipo_id"),
+        inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    private Set<Usuario> miembros = new HashSet<>();
+    
+    // Constructor, getters y setters
+}
+
+// Entidad Usuario.java
+@Entity
+public class Usuario {
+// ...
+@ManyToMany(mappedBy = "miembros")
+private Set<Equipo> equipos = new HashSet<>();
+}
+```
+##### Explanation:
+
+- @ManyToMany relationship with explicit join table (equipo_usuario).
+- Bidirectional mapping with mappedBy to avoid relationship duplication.
+- Use of Set instead of List for many-to-many relationships for efficiency.
 
 ### 7. Database Tables Screenshots
 
